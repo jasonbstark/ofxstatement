@@ -164,8 +164,6 @@ def edit_config(args: argparse.Namespace) -> None:
 
 
 def convert(args: argparse.Namespace) -> int:
-    print(f"tool:convert args = {args}")
-    print(f"tool:convert args.format = {args.format}")
     appui = ui.UI()
     config = configuration.read(args.config)
 
@@ -213,11 +211,14 @@ def convert(args: argparse.Namespace) -> int:
         return 2  # Validation error
 
     encoding = settings.get("encoding", "utf-8")
+    if args.format != "ofx" and args.format != "csv":
+        log.error("Output format, %s, must be either ofx or csv" % args.format)
+        return 3  # error
     with smart_open(args.output, encoding) as out:
-        if format == 'osx':
+        if args.format == "ofx":
             writer = ofx.OfxWriter(statement)
             out.write(writer.toxml(pretty=args.pretty, encoding=encoding))
-        elif format == 'csv':
+        elif args.format == "csv":
             writer = csv.CsvWriter(statement)
             out.write(writer.tocsv(pretty=args.pretty, encoding=encoding))
 
