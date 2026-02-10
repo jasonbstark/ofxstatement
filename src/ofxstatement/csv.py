@@ -14,6 +14,17 @@ from ofxstatement.statement import (
     Currency,
 )
 
+from ofxstatement.gncxml_integration import Book, Portfolio, copy_gnucash_accounts, freeze_header, style_format
+# import pandas as pd
+# import sys
+# import uuid
+# from typing import Dict, Optional, Any, Iterable, List, TextIO, TypeVar, Generic
+# from decimal import Decimal as D
+# import re
+# from abc import abstractmethod
+# import csv
+# from os import path
+# from pprint import pformat
 
 class CsvWriter(object):
     def __init__(self, statement: Statement) -> None:
@@ -307,6 +318,54 @@ class CsvWriter(object):
         if inner_tran_type_tag_name:
             tb.end(inner_tran_type_tag_name)
         tb.end(line.trntype)
+
+    def initialize_book():
+        bookname = copy_gnucash_accounts()
+
+        try:
+            book = Book(bookname)
+        except OSError as err:
+            sys.exit(err)
+
+        return book
+
+    def account_balance(book, date = None, account = 'Mortgage Amerisave'):
+        id = book.accounts[book.accounts['path'] == account].index.values[0][1]
+        splits = book.splits[book.splits['act_id'] == id].sort_values(by='trn_date')
+        splits['balance'] = splits['value'].cumsum()
+    
+        if date is None:
+            balance = splits['balance'].iloc[-1]
+        else:
+            balance = splits[splits['trn_date'] <= date]['balance'].iloc[-1]
+
+        return balance
+
+    def make_multisplit_transaction(
+        transaction_id: str,
+        account: str,
+        date: str,
+        description: str,
+        amount: float,
+        value: float,
+        commodity: str | None,
+        price: float | None = None,
+        balance: float | None = None,
+    ) -> dict[str, str | float | None]:
+
+        price = price if price is not None else 1
+
+        return {
+            "TransactionId": transaction_id,
+            "Account": account,
+            "Date": date,
+            "Description": description,
+            "Amount": amount,
+            "Value": value,
+            "Commodity/Currency": commodity,
+            "Price/Rate": 1 if price is None else price,
+            "Balance": balance,
+        }
 
     def buildBankAccount(self, account: BankAccount) -> None:
         self.buildText("BANKID", account.bank_id)
