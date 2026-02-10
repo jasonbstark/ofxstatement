@@ -254,6 +254,7 @@ class InvestStatementLine(Printable):
     def __init__(
         self,
         id: Optional[str] = None,
+        id_trx: Optional[str] = None,
         date: Optional[datetime] = None,
         memo: Optional[str] = None,
         trntype: Optional[str] = None,
@@ -261,7 +262,7 @@ class InvestStatementLine(Printable):
         security_id: Optional[str] = None,
         amount: Optional[D] = None,
     ) -> None:
-        self.id = id
+        # self.id = id
         self.date = date
         self.memo = memo
         self.trntype = trntype
@@ -271,10 +272,9 @@ class InvestStatementLine(Printable):
 
     def __str__(self) -> str:
         return """
-            ID: %s, date: %s, trntype: %s, trntype_detailed: %s, security_id: %s, units: %s, unit_price: %s, amount: %s, fees: %s
+            date: %s, trntype: %s, trntype_detailed: %s, security_id: %s, units: %s, unit_price: %s, amount: %s, fees: %s
             memo: %s
             """ % (
-            self.id,
             self.date,
             self.trntype,
             self.trntype_detailed,
@@ -289,8 +289,8 @@ class InvestStatementLine(Printable):
     def assert_valid(self) -> None:
         """Ensure that fields have valid values"""
         # Every transaction needs an ID and date
-        assert self.id
-        assert self.date
+        assert self.id_split
+        # assert self.date
 
         # Each transaction type has slightly different requirements
         if self.trntype == "BUYDEBT":

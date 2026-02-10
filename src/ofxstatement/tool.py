@@ -15,7 +15,7 @@ else:
     from importlib.metadata import version
 
 
-from ofxstatement import ui, configuration, plugin, ofx, exceptions
+from ofxstatement import ui, configuration, plugin, ofx, csv_writer, exceptions
 from typing import Optional, TextIO, Generator
 
 
@@ -92,6 +92,16 @@ def make_args_parser() -> argparse.ArgumentParser:
             "input file type. This is a section in "
             "the config file or plugin name if you "
             "have no config file."
+        ),
+    )
+    parser_convert.add_argument(
+        "-f",
+        "--format",
+        required=False,
+        default="ofx",
+        help=(
+            "output file format. Output will be OFX "
+            "unless argument is 'csv'."
         ),
     )
     parser_convert.add_argument(
@@ -201,9 +211,16 @@ def convert(args: argparse.Namespace) -> int:
         return 2  # Validation error
 
     encoding = settings.get("encoding", "utf-8")
+    if args.format != "ofx" and args.format != "csv":
+        log.error("Output format, %s, must be either ofx or csv" % args.format)
+        return 3  # error
     with smart_open(args.output, encoding) as out:
-        writer = ofx.OfxWriter(statement)
-        out.write(writer.toxml(pretty=args.pretty, encoding=encoding))
+        if args.format == "ofx":
+            writer = ofx.OfxWriter(statement)
+            out.write(writer.toxml(pretty=args.pretty, encoding=encoding))
+        elif args.format == "csv":
+            writer = csv_writer.CsvWriter(statement)
+            out.write(writer.tocsv())
 
     n_lines = len(statement.lines)
     n_invest_lines = len(statement.invest_lines)
