@@ -15,7 +15,7 @@ else:
     from importlib.metadata import version
 
 
-from ofxstatement import ui, configuration, plugin, ofx, exceptions
+from ofxstatement import ui, configuration, plugin, ofx, csv, exceptions
 from typing import Optional, TextIO, Generator
 
 
@@ -95,6 +95,16 @@ def make_args_parser() -> argparse.ArgumentParser:
         ),
     )
     parser_convert.add_argument(
+        "-f",
+        "--format",
+        required=False,
+        default="ofx",
+        help=(
+            "output file format. Output will be OFX "
+            "unless argument is 'csv'."
+        ),
+    )
+    parser_convert.add_argument(
         "-p",
         "--pretty",
         action="store_true",
@@ -154,6 +164,8 @@ def edit_config(args: argparse.Namespace) -> None:
 
 
 def convert(args: argparse.Namespace) -> int:
+    print(f"tool:convert args = {args}")
+    print(f"tool:convert args.format = {args.format}")
     appui = ui.UI()
     config = configuration.read(args.config)
 
@@ -202,8 +214,12 @@ def convert(args: argparse.Namespace) -> int:
 
     encoding = settings.get("encoding", "utf-8")
     with smart_open(args.output, encoding) as out:
-        writer = ofx.OfxWriter(statement)
-        out.write(writer.toxml(pretty=args.pretty, encoding=encoding))
+        if format == 'osx':
+            writer = ofx.OfxWriter(statement)
+            out.write(writer.toxml(pretty=args.pretty, encoding=encoding))
+        elif format == 'csv':
+            writer = csv.CsvWriter(statement)
+            out.write(writer.tocsv(pretty=args.pretty, encoding=encoding))
 
     n_lines = len(statement.lines)
     n_invest_lines = len(statement.invest_lines)
