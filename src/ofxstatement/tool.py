@@ -15,7 +15,7 @@ else:
     from importlib.metadata import version
 
 
-from ofxstatement import ui, configuration, plugin, ofx, csv, exceptions
+from ofxstatement import ui, configuration, plugin, ofx, csv_writer, exceptions
 from typing import Optional, TextIO, Generator
 
 
@@ -219,8 +219,8 @@ def convert(args: argparse.Namespace) -> int:
             writer = ofx.OfxWriter(statement)
             out.write(writer.toxml(pretty=args.pretty, encoding=encoding))
         elif args.format == "csv":
-            writer = csv.CsvWriter(statement)
-            out.write(writer.tocsv(pretty=args.pretty, encoding=encoding))
+            writer = csv_writer.CsvWriter(statement)
+            out.write(writer.tocsv())
 
     n_lines = len(statement.lines)
     n_invest_lines = len(statement.invest_lines)
