@@ -30,12 +30,6 @@ class CsvWriter(object):
         (re.compile(r"352042315"), "Fidelity:Fidelity 352042315 (Elisa)"),
     ]
 
-    mappings_subaccounts = [
-        ("Fidelity:Fidelity 159258482 (Jason)", "CRWV", "Fidelity:Fidelity 159258482 (Jason):CRWV"),
-    ]
-
-    mortgage_pattern = re.compile(r"^DIRECT DEBIT FREEDOM MTG PYMTS")
-
     def __init__(self, statement: Statement) -> None:
         self.statement = statement
         self.genTime = datetime.now()
