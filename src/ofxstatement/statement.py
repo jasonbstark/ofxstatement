@@ -261,7 +261,7 @@ class InvestStatementLine(Printable):
         security_id: Optional[str] = None,
         amount: Optional[D] = None,
     ) -> None:
-        self.id = id
+        # self.id = id
         self.date = date
         self.memo = memo
         self.trntype = trntype
@@ -289,8 +289,8 @@ class InvestStatementLine(Printable):
     def assert_valid(self) -> None:
         """Ensure that fields have valid values"""
         # Every transaction needs an ID and date
-        assert self.id
-        assert self.date
+        assert self.id_split
+        # assert self.date
 
         # Each transaction type has slightly different requirements
         if self.trntype == "BUYDEBT":

@@ -49,10 +49,11 @@ class CsvWriter(object):
             self.ld.append(d)
 
         df_statement = pd.DataFrame(self.ld)
-        df_statement = df_statement.set_index("id")
+        # df_statement = df_statement.set_index("id")
 
         df_cols = df_statement.columns
-        cols = ["date", "account_type","account","memo","trntype","trntype_detailed","security_id","units","unit_price","amount"]
+        cols = ["date","account","memo","security_id","units","unit_price","amount","id_trx", "id_split"]
+        # cols = ["date", "account_type","account","memo", "id_trx", "id_split","trntype","trntype_detailed","security_id","units","unit_price","amount"]
         for col in cols:
             if col not in df_cols:
                 df_statement[col] = pd.Series()
@@ -60,7 +61,7 @@ class CsvWriter(object):
         newcols = [col for col in cols if col in df_cols] + [col for col in df_cols if col not in cols]
         df_statement = df_statement[newcols]
         
-        self.csv_statement = df_statement.to_csv(date_format='%Y-%m-%d', quoting=csv.QUOTE_STRINGS)
+        self.csv_statement = df_statement.to_csv(date_format='%Y-%m-%d', quoting=csv.QUOTE_STRINGS, index=False)
         return
 
     # Some methods adopted from ofxstatement.ofx
