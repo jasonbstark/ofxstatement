@@ -254,6 +254,7 @@ class InvestStatementLine(Printable):
     def __init__(
         self,
         id: Optional[str] = None,
+        id_trx: Optional[str] = None,
         date: Optional[datetime] = None,
         memo: Optional[str] = None,
         trntype: Optional[str] = None,
@@ -271,10 +272,9 @@ class InvestStatementLine(Printable):
 
     def __str__(self) -> str:
         return """
-            ID: %s, date: %s, trntype: %s, trntype_detailed: %s, security_id: %s, units: %s, unit_price: %s, amount: %s, fees: %s
+            date: %s, trntype: %s, trntype_detailed: %s, security_id: %s, units: %s, unit_price: %s, amount: %s, fees: %s
             memo: %s
             """ % (
-            self.id,
             self.date,
             self.trntype,
             self.trntype_detailed,
