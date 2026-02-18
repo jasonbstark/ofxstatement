@@ -20,8 +20,6 @@ import pandas as pd
 import sys
 import re
 import csv
-# import uuid
-# from typing import Dict, Optional, Any, Iterable, List, TextIO, TypeVar, Generic
 
 class CsvWriter(object):
     mappings_account = [
@@ -49,7 +47,6 @@ class CsvWriter(object):
             self.ld.append(d)
 
         df_statement = pd.DataFrame(self.ld)
-        # df_statement = df_statement.set_index("id")
 
         df_cols = df_statement.columns
         cols = ["date","account","memo","security_id","units","unit_price","amount","id_trx", "id_split"]
