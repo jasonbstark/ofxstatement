@@ -48,15 +48,10 @@ class CsvWriter(object):
 
         df_statement = pd.DataFrame(self.ld)
 
-        df_cols = df_statement.columns
-        cols = ["date","account","memo","security_id","units","unit_price","amount","id_trx", "id_split"]
-        # cols = ["date", "account_type","account","memo", "id_trx", "id_split","trntype","trntype_detailed","security_id","units","unit_price","amount"]
-        for col in cols:
-            if col not in df_cols:
-                df_statement[col] = pd.Series()
-        df_cols = df_statement.columns
-        newcols = [col for col in cols if col in df_cols] + [col for col in df_cols if col not in cols]
-        df_statement = df_statement[newcols]
+        cols = ["date","account","memo","security_id","units","unit_price","amount", "id_trx"]
+        df_statement = df_statement[cols]
+        # Rename columns to those used by GnuCash csv importer
+        df_statement = df_statement.rename(columns={"date": "Date", "account": "Account", "memo": "Description", "security_id": "Transaction Commodity", "units": "Amount", "unit_price": "Price", "amount": "Value", "id_trx": "Transaction ID"})
         
         self.csv_statement = df_statement.to_csv(date_format='%Y-%m-%d', quoting=csv.QUOTE_STRINGS, index=False)
         return
