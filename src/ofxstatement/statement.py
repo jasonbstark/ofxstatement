@@ -106,6 +106,7 @@ class Statement(Printable):
         currency: Optional[str] = None,
         account_type: str = "CHECKING",
         branch_id: Optional[str] = None,
+        type: Optional[str] = None,
     ) -> None:
         self.lines = []
         self.invest_lines = []
@@ -255,36 +256,40 @@ class InvestStatementLine(Printable):
         self,
         id: Optional[str] = None,
         id_trx: Optional[str] = None,
-        date: Optional[datetime] = None,
-        memo: Optional[str] = None,
+        Date: Optional[datetime] = None,
+        Description: Optional[str] = None,
         trntype: Optional[str] = None,
         trntype_detailed: Optional[str] = None,
-        security_id: Optional[str] = None,
-        amount: Optional[D] = None,
+        TransactionCommodity: Optional[str] = None,
+        Amount: Optional[D] = None,
+        Price: Optional[D] = None,
+        Value: Optional[D] = None,
+        Status: Optional[str] = None,
+        TransactionID: Optional[str] = None,
     ) -> None:
         # self.id = id
-        self.date = date
-        self.memo = memo
+        self.Date = Date
+        self.Description = Description
         self.trntype = trntype
         self.trntype_detailed = trntype_detailed
-        self.security_id = security_id
-        self.amount = amount
+        self.TransactionCommodity = TransactionCommodity
+        self.Amount = Amount
+        self.Price = Price
+        self.Value = Value
+        self.Status = Status
+        self.TransactionID = TransactionID
 
     def __str__(self) -> str:
-        return """
-            date: %s, trntype: %s, trntype_detailed: %s, security_id: %s, units: %s, unit_price: %s, amount: %s, fees: %s
-            memo: %s
-            """ % (
-            self.date,
-            self.trntype,
-            self.trntype_detailed,
-            self.security_id,
-            self.units,
-            self.unit_price,
-            self.amount,
-            self.fees,
-            self.memo,
-        )
+        s = ""
+        for key, value in self.__dict__.items():
+            skv = f"{key}: "
+            if value == "":
+                skv += "\"\", "
+            else:
+                skv += f"{value}, "
+            s += skv
+        s = s[:-2]        
+        return s
 
     def assert_valid(self) -> None:
         """Ensure that fields have valid values"""
@@ -340,8 +345,8 @@ class InvestStatementLine(Printable):
             self.trntype_detailed,
             INVEST_TRANSACTION_INCOMETYPES,
         )
-        assert self.security_id
-        assert self.amount
+        assert self.TransactionCommodity
+        assert self.Value
 
     def assert_valid_invbanktran(self):
         assert (
@@ -350,14 +355,14 @@ class InvestStatementLine(Printable):
             self.trntype_detailed,
             STMTTRN_TRNTYPES,
         )
-        assert self.amount
+        assert self.Amount
 
     def assert_valid_invexpense(self):
         assert (
             self.trntype_detailed is None
         ), f"trntype_detailed '{self.trntype_detailed}' should be empty for {self.trntype}"
-        assert self.security_id
-        assert self.amount
+        assert self.TransactionCommodity
+        assert self.Amount
 
     def assert_valid_selldebt(self):
         assert (
@@ -378,20 +383,20 @@ class InvestStatementLine(Printable):
         assert (
             self.trntype_detailed is None
         ), f"trntype_detailed '{self.trntype_detailed}' should be empty for {self.trntype}"
-        assert self.security_id
-        assert self.units
+        assert self.TransactionCommodity
+        assert self.Amount
 
     def assert_valid_invbuy(self):
-        assert self.security_id
-        assert self.units
-        assert self.unit_price
-        assert self.amount
+        assert self.TransactionCommodity
+        assert self.Amount
+        assert self.Price
+        assert self.Value
 
     def assert_valid_invsell(self):
-        assert self.security_id
-        assert self.units
-        assert self.unit_price
-        assert self.amount
+        assert self.TransactionCommodity
+        assert self.Amount
+        assert self.Price
+        assert self.Value
 
 
 class BankAccount(Printable):

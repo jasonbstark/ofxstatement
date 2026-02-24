@@ -197,8 +197,11 @@ def convert(args: argparse.Namespace) -> int:
 
     # process the input and produce output
     parser = p.get_parser(args.input)
+    # print(f"parser = {parser}")
     try:
         statement = parser.parse()
+        # print(f"statement = \n{statement}")
+        statement.type = args.type
     except exceptions.ParseError as e:
         log.error("Parse error on line %s: %s" % (e.lineno, e.message))
         return 2  # parse error
@@ -220,6 +223,7 @@ def convert(args: argparse.Namespace) -> int:
             out.write(writer.toxml(pretty=args.pretty, encoding=encoding))
         elif args.format == "csv":
             writer = csv_writer.CsvWriter(statement)
+            # print(f"statement = \n{statement}")
             out.write(writer.tocsv())
 
     n_lines = len(statement.lines)

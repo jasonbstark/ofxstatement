@@ -48,11 +48,15 @@ class CsvWriter(object):
 
         df_statement = pd.DataFrame(self.ld)
 
-        cols = ["date","account","memo","security_id","units","unit_price","amount", "id_trx"]
+        if self.statement.type == 'fidelity':
+            cols = ["Date","Account","Description","TransactionCommodity","Amount","Price","Value", "TransactionID"]
+        elif self.statement.type == 'citicard':
+            cols = ["Date","Account","Description","Amount","Price","Value","TransactionID"]
+        else:
+            cols = df_statement.columns
+
         df_statement = df_statement[cols]
-        # Rename columns to those used by GnuCash csv importer
-        df_statement = df_statement.rename(columns={"date": "Date", "account": "Account", "memo": "Description", "security_id": "Transaction Commodity", "units": "Amount", "unit_price": "Price", "amount": "Value", "id_trx": "Transaction ID"})
-        
+
         self.csv_statement = df_statement.to_csv(date_format='%Y-%m-%d', quoting=csv.QUOTE_STRINGS, index=False)
         return
 
