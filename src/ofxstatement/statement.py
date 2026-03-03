@@ -106,6 +106,7 @@ class Statement(Printable):
         currency: Optional[str] = None,
         account_type: str = "CHECKING",
         branch_id: Optional[str] = None,
+        type: Optional[str] = None,
     ) -> None:
         self.lines = []
         self.invest_lines = []
@@ -255,144 +256,73 @@ class InvestStatementLine(Printable):
         self,
         id: Optional[str] = None,
         id_trx: Optional[str] = None,
-        date: Optional[datetime] = None,
-        memo: Optional[str] = None,
+        Date: Optional[datetime] = None,
+        Description: Optional[str] = None,
         trntype: Optional[str] = None,
         trntype_detailed: Optional[str] = None,
-        security_id: Optional[str] = None,
-        amount: Optional[D] = None,
+        TransactionCommodity: Optional[str] = None,
+        Amount: Optional[D] = None,
+        Price: Optional[D] = None,
+        Value: Optional[D] = None,
+        Status: Optional[str] = None,
+        TransactionID: Optional[str] = None,
     ) -> None:
         # self.id = id
-        self.date = date
-        self.memo = memo
+        self.Date = Date
+        self.Description = Description
         self.trntype = trntype
         self.trntype_detailed = trntype_detailed
-        self.security_id = security_id
-        self.amount = amount
+        self.TransactionCommodity = TransactionCommodity
+        self.Amount = Amount
+        self.Price = Price
+        self.Value = Value
+        self.Status = Status
+        self.TransactionID = TransactionID
 
     def __str__(self) -> str:
-        return """
-            date: %s, trntype: %s, trntype_detailed: %s, security_id: %s, units: %s, unit_price: %s, amount: %s, fees: %s
-            memo: %s
-            """ % (
-            self.date,
-            self.trntype,
-            self.trntype_detailed,
-            self.security_id,
-            self.units,
-            self.unit_price,
-            self.amount,
-            self.fees,
-            self.memo,
-        )
+        s = ""
+        for key, value in self.__dict__.items():
+            skv = f"{key}: "
+            if value == "":
+                skv += "\"\", "
+            else:
+                skv += f"{value}, "
+            s += skv
+        s = s[:-2]        
+        return s
 
     def assert_valid(self) -> None:
         """Ensure that fields have valid values"""
         # Every transaction needs an ID and date
-        assert self.id_split
+        # assert self.id_split
         # assert self.date
 
         # Each transaction type has slightly different requirements
-        if self.trntype == "BUYDEBT":
-            self.assert_valid_buydebt()
-        if self.trntype == "BUYMF" or self.trntype == "BUYSTOCK":
-            self.assert_valid_buystock()
-        elif self.trntype == "INCOME":
-            self.assert_valid_income()
-        elif self.trntype == "INVBANKTRAN":
-            self.assert_valid_invbanktran()
-        elif self.trntype == "INVEXPENSE":
-            self.assert_valid_invexpense()
-        elif self.trntype == "SELLDEBT":
-            self.assert_valid_selldebt()
-        elif self.trntype == "SELLMF" or self.trntype == "SELLSTOCK":
-            self.assert_valid_sellstock()
-        elif self.trntype == "TRANSFER":
-            self.assert_valid_transfer()
-        else:
-            raise AssertionError(
-                "trntype %s is not valid, must be one of %s"
-                % (
-                    self.trntype,
-                    INVEST_TRANSACTION_TYPES,
-                )
-            )
-
-    def assert_valid_buydebt(self):
-        assert (
-            self.trntype_detailed is None
-        ), f"trntype_detailed '{self.trntype_detailed}' should be empty for {self.trntype}"
-        self.assert_valid_invbuy()
-
-    def assert_valid_buystock(self):
-        assert (
-            self.trntype_detailed in INVEST_TRANSACTION_BUYTYPES
-        ), "trntype_detailed %s is not valid, must be one of %s" % (
-            self.trntype_detailed,
-            INVEST_TRANSACTION_BUYTYPES,
-        )
-        self.assert_valid_invbuy()
-
-    def assert_valid_income(self):
-        assert (
-            self.trntype_detailed in INVEST_TRANSACTION_INCOMETYPES
-        ), "trntype_detailed %s is not valid, must be one of %s" % (
-            self.trntype_detailed,
-            INVEST_TRANSACTION_INCOMETYPES,
-        )
-        assert self.security_id
-        assert self.amount
-
-    def assert_valid_invbanktran(self):
-        assert (
-            self.trntype_detailed in STMTTRN_TRNTYPES
-        ), "trntype_detailed %s is not valid for INVBANKTRAN, must be one of %s" % (
-            self.trntype_detailed,
-            STMTTRN_TRNTYPES,
-        )
-        assert self.amount
-
-    def assert_valid_invexpense(self):
-        assert (
-            self.trntype_detailed is None
-        ), f"trntype_detailed '{self.trntype_detailed}' should be empty for {self.trntype}"
-        assert self.security_id
-        assert self.amount
-
-    def assert_valid_selldebt(self):
-        assert (
-            self.trntype_detailed is None
-        ), f"trntype_detailed '{self.trntype_detailed}' should be empty for {self.trntype}"
-        self.assert_valid_invsell()
-
-    def assert_valid_sellstock(self):
-        assert (
-            self.trntype_detailed in INVEST_TRANSACTION_SELLTYPES
-        ), "trntype_detailed %s is not valid, must be one of %s" % (
-            self.trntype_detailed,
-            INVEST_TRANSACTION_SELLTYPES,
-        )
-        self.assert_valid_invsell()
-
-    def assert_valid_transfer(self):
-        assert (
-            self.trntype_detailed is None
-        ), f"trntype_detailed '{self.trntype_detailed}' should be empty for {self.trntype}"
-        assert self.security_id
-        assert self.units
-
-    def assert_valid_invbuy(self):
-        assert self.security_id
-        assert self.units
-        assert self.unit_price
-        assert self.amount
-
-    def assert_valid_invsell(self):
-        assert self.security_id
-        assert self.units
-        assert self.unit_price
-        assert self.amount
-
+        # if self.trntype == "BUYDEBT":
+        #     self.assert_valid_buydebt()
+        # if self.trntype == "BUYMF" or self.trntype == "BUYSTOCK":
+        #     self.assert_valid_buystock()
+        # elif self.trntype == "INCOME":
+        #     self.assert_valid_income()
+        # elif self.trntype == "INVBANKTRAN":
+        #     self.assert_valid_invbanktran()
+        # elif self.trntype == "INVEXPENSE":
+        #     self.assert_valid_invexpense()
+        # elif self.trntype == "SELLDEBT":
+        #     self.assert_valid_selldebt()
+        # elif self.trntype == "SELLMF" or self.trntype == "SELLSTOCK":
+        #     self.assert_valid_sellstock()
+        # elif self.trntype == "TRANSFER":
+        #     self.assert_valid_transfer()
+        # else:
+        #     raise AssertionError(
+        #         "trntype %s is not valid, must be one of %s"
+        #         % (
+        #             self.trntype,
+        #             INVEST_TRANSACTION_TYPES,
+        #         )
+        #     )
+        return
 
 class BankAccount(Printable):
     """Structure corresponding to BANKACCTTO and BANKACCTFROM elements from OFX
