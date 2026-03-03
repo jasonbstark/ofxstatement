@@ -49,13 +49,13 @@ class CsvWriter(object):
         df_statement = pd.DataFrame(self.ld)
 
         if self.statement.type == 'fidelity':
-            cols = ["Date","Account","Description","TransactionCommodity","Amount","Price","Value", "TransactionID"]
+            cols = ["Date","Account","Description","TransactionCommodity","Amount","Price","Value", "Status", "TransactionID"]
         elif self.statement.type == 'citicard':
             cols = ["Date","Account","Description","Amount","Price","Value","TransactionID"]
         else:
             cols = df_statement.columns
 
-        df_statement = df_statement[cols]
+        df_statement = df_statement[cols].sort_values(by=["Date", "TransactionID"], kind="stable")
 
         self.csv_statement = df_statement.to_csv(date_format='%Y-%m-%d', quoting=csv.QUOTE_STRINGS, index=False)
         return
