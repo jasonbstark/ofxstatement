@@ -29,6 +29,7 @@ class CsvWriter(object):
     ]
 
     def __init__(self, statement: Statement) -> None:
+        # print(f"CsvWriter:  init")
         self.statement = statement
         self.genTime = datetime.now()
         self.ld = []
@@ -36,22 +37,30 @@ class CsvWriter(object):
         self.invest_transactions_float_precision = 5
 
     def tocsv(self, pretty: bool = False, encoding: str = "utf-8") -> str:
+        # print(f"CsvWriter.tocsv:  self = {self}")
         self.buildDocument()
         return self.csv_statement
 
     def buildDocument(self) -> list[dict[str, str | float | None]]:
         # Build transaction list as list of dictionaries, using contents of self.statement
+        # print(f"CsvWriter.buildDocument:  self = {self}")
         for line in self.statement.invest_lines:
+            # print(f"CsvWriter.buildDocument:  line = {line}")
             d = line.__dict__
 
             self.ld.append(d)
 
         df_statement = pd.DataFrame(self.ld)
+        # print(f"CsvWriter.buildDocument:  df_statement = {df_statement}")
+        # print(f"CsvWriter.buildDocument:  df_statement.columns = {df_statement.columns}")
 
-        cols = ["date","account","memo","security_id","units","unit_price","amount", "id_trx"]
+        # cols = ["date","account","memo","security_id","units","unit_price","amount", "id_trx"]
+        cols = ["Date","Account","Description","TransactionCommodity","Amount","Price","Value", "TransactionID"]
+        # print(f"CsvWriter.buildDocument:  cols = {cols}")
         df_statement = df_statement[cols]
+
         # Rename columns to those used by GnuCash csv importer
-        df_statement = df_statement.rename(columns={"date": "Date", "account": "Account", "memo": "Description", "security_id": "Transaction Commodity", "units": "Amount", "unit_price": "Price", "amount": "Value", "id_trx": "Transaction ID"})
+        # df_statement = df_statement.rename(columns={"date": "Date", "account": "Account", "memo": "Description", "security_id": "Transaction Commodity", "units": "Amount", "unit_price": "Price", "amount": "Value", "id_trx": "Transaction ID"})
         
         self.csv_statement = df_statement.to_csv(date_format='%Y-%m-%d', quoting=csv.QUOTE_STRINGS, index=False)
         return
