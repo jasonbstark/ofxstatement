@@ -29,6 +29,7 @@ class CsvWriter(object):
     ]
 
     def __init__(self, statement: Statement) -> None:
+        # print(f"CsvWriter:  init")
         self.statement = statement
         self.genTime = datetime.now()
         self.ld = []
@@ -36,6 +37,7 @@ class CsvWriter(object):
         self.invest_transactions_float_precision = 5
 
     def tocsv(self, pretty: bool = False, encoding: str = "utf-8") -> str:
+        # print(f"CsvWriter.tocsv:  self = {self}")
         self.buildDocument()
         return self.csv_statement
 
@@ -48,9 +50,9 @@ class CsvWriter(object):
 
         df_statement = pd.DataFrame(self.ld)
 
-        if self.statement.type == 'fidelity':
+        if self.statement.type == 'Fidelity':
             cols = ["Date","Account","Description","TransactionCommodity","Amount","Price","Value", "Status", "TransactionID"]
-        elif self.statement.type == 'citicard':
+        elif self.statement.type == 'Citicard':
             cols = ["Date","Account","Description","Amount","Price","Value","TransactionID"]
         else:
             cols = df_statement.columns
